@@ -25,6 +25,8 @@ public class Recipe {
     private Long id;
     @Column(name = "name")
     private String name;
+    @Column(name = "short_description")
+    private String shortDescription;
     @Column(name = "description")
     private String description;
     @Column(name = "date")
@@ -33,6 +35,13 @@ public class Recipe {
     private BigDecimal totalPriceHrk;
     @Column(name = "total_price_eur")
     private BigDecimal totalPriceEur;
-    @OneToMany(mappedBy = "recipe")
+    @OneToMany(targetEntity = RecipeItem.class, mappedBy = "recipe")
     List<RecipeItem> recipeItems;
+    @ManyToMany(targetEntity = Ingredient.class)
+    @JoinTable(
+            name="recipe_item",
+            joinColumns = {@JoinColumn(name = "recipe_id")},
+            inverseJoinColumns = {@JoinColumn(name = "ingredient_id")}
+    )
+    private List<Ingredient> ingredients;
 }

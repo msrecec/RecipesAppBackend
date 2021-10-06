@@ -34,8 +34,12 @@ public class Ingredient {
     private BigDecimal totalPriceHrk;
     @Column(name = "price_eur")
     private BigDecimal totalPriceEur;
-    @OneToMany(mappedBy = "ingredient")
+    @OneToMany(targetEntity = ShoppingListItem.class ,mappedBy = "ingredient")
     List<ShoppingListItem> shoppingListItems;
-    @OneToMany(mappedBy = "ingredient")
+    @OneToMany(targetEntity = RecipeItem.class ,mappedBy = "ingredient")
     List<RecipeItem> recipeItems;
+    @ManyToMany(targetEntity = ShoppingList.class, mappedBy = "ingredients")
+    private List<ShoppingList> shoppingLists;
+    @ManyToMany(targetEntity = Recipe.class, mappedBy = "ingredients")
+    private List<Recipe> recipes;
 }

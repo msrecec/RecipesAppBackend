@@ -30,6 +30,13 @@ public class ShoppingList {
     private BigDecimal totalPriceHrk;
     @Column(name = "total_price_eur")
     private BigDecimal totalPriceEur;
-    @OneToMany(mappedBy = "shoppingList")
+    @OneToMany(targetEntity = ShoppingListItem.class ,mappedBy = "shoppingList")
     private List<ShoppingListItem> shoppingListItems;
+    @ManyToMany(targetEntity = Ingredient.class)
+    @JoinTable(
+            name="shopping_list_item",
+            joinColumns = {@JoinColumn(name = "shopping_list_id")},
+            inverseJoinColumns = {@JoinColumn(name = "ingredient_id")}
+    )
+    private List<Ingredient> ingredients;
 }
