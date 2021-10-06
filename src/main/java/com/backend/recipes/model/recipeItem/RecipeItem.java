@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 public class RecipeItem {
-    @SequenceGenerator(name = "recipe_item_sequence", sequenceName = "recipe_item_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "recipe_item_sequence", sequenceName = "recipe_item_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "recipe_item_sequence")
     @Id
     @Column(name = "id")

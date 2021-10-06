@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 public class ShoppingListItem {
-    @SequenceGenerator(name = "shopping_list_item_sequence", sequenceName = "shopping_list_item_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "shopping_list_item_sequence", sequenceName = "shopping_list_item_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "shopping_list_item_sequence")
     @Id
     @Column(name = "id")

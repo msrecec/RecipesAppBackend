@@ -19,7 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ShoppingList {
-    @SequenceGenerator(name = "shopping_list_sequence", sequenceName = "shopping_list_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "shopping_list_sequence", sequenceName = "shopping_list_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "shopping_list_sequence")
     @Id
     @Column(name = "id")

@@ -20,7 +20,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Recipe {
-    @SequenceGenerator(name = "recipe_sequence", sequenceName = "recipe_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "recipe_sequence", sequenceName = "recipe_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "recipe_sequence")
     @Column(name = "id")
     @Id

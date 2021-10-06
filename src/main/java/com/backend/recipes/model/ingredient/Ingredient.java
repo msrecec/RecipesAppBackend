@@ -21,7 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Ingredient {
-    @SequenceGenerator(name = "ingredient_sequence", sequenceName = "ingredient_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "ingredient_sequence", sequenceName = "ingredient_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ingredient_sequence")
     @Column(name = "id")
     @Id
