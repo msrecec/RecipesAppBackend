@@ -2,7 +2,7 @@ package com.backend.recipes.mapping.mapper.recipeItem;
 
 import com.backend.recipes.dto.recipeItem.RecipeItemDTO;
 import com.backend.recipes.mapping.mapper.ingredient.IngredientMapper;
-import com.backend.recipes.model.RecipeItem;
+import com.backend.recipes.model.recipeItem.RecipeItem;
 import org.springframework.stereotype.Component;
 
 @Component

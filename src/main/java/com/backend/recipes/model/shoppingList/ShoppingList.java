@@ -1,5 +1,7 @@
-package com.backend.recipes.model;
+package com.backend.recipes.model.shoppingList;
 
+import com.backend.recipes.model.shoppingListItem.ShoppingListItem;
+import com.backend.recipes.model.ingredient.Ingredient;
 import lombok.*;
 
 import javax.persistence.*;

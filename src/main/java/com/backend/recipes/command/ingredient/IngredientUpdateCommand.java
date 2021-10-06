@@ -1,8 +1,15 @@
 package com.backend.recipes.command.ingredient;
 
+import lombok.*;
+
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Getter
+@Setter
 public class IngredientUpdateCommand {
     @NotNull(message = "Ingredient id must not be null")
     @PositiveOrZero(message = "Ingredient id must be a positive number or zero")

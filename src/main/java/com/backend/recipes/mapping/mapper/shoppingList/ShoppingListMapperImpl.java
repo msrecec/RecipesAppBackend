@@ -2,7 +2,7 @@ package com.backend.recipes.mapping.mapper.shoppingList;
 
 import com.backend.recipes.dto.shoppingList.ShoppingListDTO;
 import com.backend.recipes.mapping.mapper.shoppingListItem.ShoppingListItemMapper;
-import com.backend.recipes.model.ShoppingList;
+import com.backend.recipes.model.shoppingList.ShoppingList;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
