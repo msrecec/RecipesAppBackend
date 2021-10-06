@@ -31,9 +31,9 @@ public class Ingredient {
     @Column(name = "rating")
     private Integer rating;
     @Column(name = "price_hrk")
-    private BigDecimal totalPriceHrk;
+    private BigDecimal priceHrk;
     @Column(name = "price_eur")
-    private BigDecimal totalPriceEur;
+    private BigDecimal priceEur;
     @OneToMany(targetEntity = ShoppingListItem.class ,mappedBy = "ingredient")
     List<ShoppingListItem> shoppingListItems;
     @OneToMany(targetEntity = RecipeItem.class ,mappedBy = "ingredient")
