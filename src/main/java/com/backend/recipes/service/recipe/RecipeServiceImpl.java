@@ -12,6 +12,7 @@ import com.backend.recipes.model.recipe.Recipe;
 import com.backend.recipes.model.recipeItem.RecipeItem;
 import com.backend.recipes.repository.hnbAPI.HnbRepository;
 import com.backend.recipes.repository.ingredient.IngredientRepositoryJpa;
+import com.backend.recipes.repository.recipe.RecipeRepository;
 import com.backend.recipes.repository.recipe.RecipeRepositoryJpa;
 import com.backend.recipes.repository.recipeItem.RecipeItemRepositoryJpa;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 public class RecipeServiceImpl implements RecipeService{
 
     RecipeRepositoryJpa recipeRepositoryJpa;
+    RecipeRepository recipeRepository;
     IngredientRepositoryJpa ingredientRepositoryJpa;
     RecipeItemRepositoryJpa recipeItemRepositoryJpa;
     HnbRepository hnbRepository;
@@ -39,12 +41,14 @@ public class RecipeServiceImpl implements RecipeService{
 
     public RecipeServiceImpl(
             RecipeRepositoryJpa recipeRepositoryJpa,
+            RecipeRepository recipeRepository,
             RecipeMapper recipeMapper,
             IngredientRepositoryJpa ingredientRepositoryJpa,
             RecipeItemRepositoryJpa recipeItemRepositoryJpa,
             HnbRepository hnbRepository
     ) {
         this.recipeRepositoryJpa = recipeRepositoryJpa;
+        this.recipeRepository = recipeRepository;
         this.recipeMapper = recipeMapper;
         this.ingredientRepositoryJpa = ingredientRepositoryJpa;
         this.recipeItemRepositoryJpa = recipeItemRepositoryJpa;
@@ -130,7 +134,7 @@ public class RecipeServiceImpl implements RecipeService{
         for(RecipeItemNestedSaveCommand nestedSaveCommand : command.getRecipeItems()) {
             boolean present = false;
             for(RecipeItem recipeItem : recipe.get().getRecipeItems()) {
-                if(recipeItem.getRecipe().getId().equals(nestedSaveCommand.getId())) {
+                if(recipeItem.getIngredient().getId().equals(nestedSaveCommand.getId())) {
                     present = true;
                     recipeItem.setQuantity(nestedSaveCommand.getQuantity());
                     recipeItemRepositoryJpa.save(recipeItem);
@@ -155,6 +159,7 @@ public class RecipeServiceImpl implements RecipeService{
             }
             if(!present) {
                 recipeItemRepositoryJpa.deleteById(recipeItem.getId());
+                recipe.get().getRecipeItems().remove(recipeItem);
             }
         }
 
@@ -175,13 +180,8 @@ public class RecipeServiceImpl implements RecipeService{
     @Override
     @Transactional
     public void deleteById(Long id) {
-        Optional<Recipe> recipe = recipeRepositoryJpa.findById(id);
 
-        for(RecipeItem r : recipe.get().getRecipeItems()) {
-            recipeItemRepositoryJpa.deleteById(r.getId());
-        }
-
-        recipeRepositoryJpa.deleteById(recipe.get().getId());
+        recipeRepository.deleteById(id);
 
     }
 }
