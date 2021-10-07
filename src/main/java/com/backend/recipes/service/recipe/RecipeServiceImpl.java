@@ -131,6 +131,18 @@ public class RecipeServiceImpl implements RecipeService{
         recipe.get().setShortDescription(command.getShortDescription());
         recipe.get().setDescription(command.getDescription());
 
+        for(RecipeItem recipeItem : recipe.get().getRecipeItems()) {
+            boolean present = false;
+            for(RecipeItemNestedSaveCommand nestedSaveCommand : command.getRecipeItems()) {
+                if(recipeItem.getIngredient().getId().equals(nestedSaveCommand.getId())) {
+                    present = true;
+                }
+            }
+            if(!present) {
+                recipeItemRepositoryJpa.deleteById(recipeItem.getId());
+            }
+        }
+
         for(RecipeItemNestedSaveCommand nestedSaveCommand : command.getRecipeItems()) {
             boolean present = false;
             for(RecipeItem recipeItem : recipe.get().getRecipeItems()) {
@@ -147,19 +159,6 @@ public class RecipeServiceImpl implements RecipeService{
                     recipeItem1 = recipeItemRepositoryJpa.save(recipeItem1);
                     recipe.get().getRecipeItems().add(recipeItem1);
                 }
-            }
-        }
-
-        for(RecipeItem recipeItem : recipe.get().getRecipeItems()) {
-            boolean present = false;
-            for(RecipeItemNestedSaveCommand nestedSaveCommand : command.getRecipeItems()) {
-                if(recipeItem.getIngredient().getId().equals(nestedSaveCommand.getId())) {
-                    present = true;
-                }
-            }
-            if(!present) {
-                recipeItemRepositoryJpa.deleteById(recipeItem.getId());
-                recipe.get().getRecipeItems().remove(recipeItem);
             }
         }
 
