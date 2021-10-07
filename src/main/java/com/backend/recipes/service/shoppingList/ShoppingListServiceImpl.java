@@ -6,6 +6,7 @@ import com.backend.recipes.dto.shoppingList.ShoppingListDTO;
 import com.backend.recipes.dto.shoppingList.ShoppingListDTOPaginated;
 import com.backend.recipes.mapping.mapper.shoppingList.ShoppingListMapper;
 import com.backend.recipes.model.shoppingList.ShoppingList;
+import com.backend.recipes.repository.recipeItem.ShoppingListRepository;
 import com.backend.recipes.repository.shoppingList.ShoppingListRepositoryJpa;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,13 @@ import java.util.stream.Collectors;
 public class ShoppingListServiceImpl implements ShoppingListService {
 
     private final ShoppingListRepositoryJpa shoppingListRepositoryJpa;
+    private final ShoppingListRepository shoppingListRepository;
     private final ShoppingListMapper shoppingListMapper;
     private static final Integer pageSize = 10;
 
-    public ShoppingListServiceImpl(ShoppingListRepositoryJpa shoppingListRepositoryJpa, ShoppingListMapper shoppingListMapper) {
+    public ShoppingListServiceImpl(ShoppingListRepositoryJpa shoppingListRepositoryJpa, ShoppingListRepository shoppingListRepository, ShoppingListMapper shoppingListMapper) {
         this.shoppingListRepositoryJpa = shoppingListRepositoryJpa;
+        this.shoppingListRepository = shoppingListRepository;
         this.shoppingListMapper = shoppingListMapper;
     }
 
@@ -67,6 +70,6 @@ public class ShoppingListServiceImpl implements ShoppingListService {
 
     @Override
     public void deleteById(Long id) {
-
+        shoppingListRepository.deleteById(id);
     }
 }
