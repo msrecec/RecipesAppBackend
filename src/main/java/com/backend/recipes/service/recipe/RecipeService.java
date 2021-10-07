@@ -1,6 +1,7 @@
 package com.backend.recipes.service.recipe;
 
 import com.backend.recipes.command.recipe.RecipeSaveCommand;
+import com.backend.recipes.command.recipe.RecipeUpdateCommand;
 import com.backend.recipes.dto.recipe.RecipeDTO;
 import com.backend.recipes.dto.recipe.RecipeDTOPaginated;
 
@@ -12,5 +13,6 @@ public interface RecipeService {
     Optional<RecipeDTO> findById(Long id);
     Optional<RecipeDTOPaginated> findPaginated(Integer page);
     Optional<RecipeDTO> save(RecipeSaveCommand command);
+    Optional<RecipeDTO> update(RecipeUpdateCommand command);
     void deleteById(Long id);
 }

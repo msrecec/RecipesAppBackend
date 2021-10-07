@@ -1,6 +1,7 @@
 package com.backend.recipes.service.recipe;
 
 import com.backend.recipes.command.recipe.RecipeSaveCommand;
+import com.backend.recipes.command.recipe.RecipeUpdateCommand;
 import com.backend.recipes.command.recipe.nested.RecipeItemNestedSaveCommand;
 import com.backend.recipes.dto.recipe.RecipeDTO;
 import com.backend.recipes.dto.recipe.RecipeDTOPaginated;
@@ -112,6 +113,62 @@ public class RecipeServiceImpl implements RecipeService{
         recipe = recipeRepositoryJpa.save(recipe);
 
         return Optional.of(recipeMapper.mapRecipeToDTO(recipe));
+    }
+
+    @Override
+    public Optional<RecipeDTO> update(RecipeUpdateCommand command) {
+        Optional<Recipe> recipe = recipeRepositoryJpa.findById(command.getId());
+
+        if(recipe.isEmpty()) {
+            return Optional.empty();
+        }
+
+        recipe.get().setName(command.getName());
+        recipe.get().setShortDescription(command.getShortDescription());
+        recipe.get().setDescription(command.getDescription());
+
+        for(RecipeItemNestedSaveCommand nestedSaveCommand : command.getRecipeItems()) {
+            boolean present = false;
+            for(RecipeItem recipeItem : recipe.get().getRecipeItems()) {
+                if(recipeItem.getRecipe().getId().equals(nestedSaveCommand.getId())) {
+                    present = true;
+                    recipeItem.setQuantity(nestedSaveCommand.getQuantity());
+                    recipeItemRepositoryJpa.save(recipeItem);
+                }
+            }
+            if(!present) {
+                Optional<Ingredient> ingredient = ingredientRepositoryJpa.findById(command.getId());
+                if(ingredient.isPresent()) {
+                    RecipeItem recipeItem1 = RecipeItem.builder().quantity(nestedSaveCommand.getQuantity()).recipe(recipe.get()).ingredient(ingredient.get()).build();
+                    recipeItem1 = recipeItemRepositoryJpa.save(recipeItem1);
+                    recipe.get().getRecipeItems().add(recipeItem1);
+                }
+            }
+        }
+
+        for(RecipeItem recipeItem : recipe.get().getRecipeItems()) {
+            boolean present = false;
+            for(RecipeItemNestedSaveCommand nestedSaveCommand : command.getRecipeItems()) {
+                if(recipeItem.getRecipe().getId().equals(nestedSaveCommand.getId())) {
+                    present = true;
+                }
+            }
+            if(!present) {
+                recipeItemRepositoryJpa.deleteById(recipeItem.getId());
+            }
+        }
+
+        recipe.get().setTotalPriceHrk(recipe.get().getRecipeItems().stream().map(item -> item.getIngredient()
+                        .getPriceHrk().multiply(new BigDecimal(item.getQuantity())))
+                .reduce(new BigDecimal(0), (a, b) -> a.add(b)));
+
+        recipe.get().setTotalPriceEur(recipe.get().getTotalPriceHrk().divide(new BigDecimal(hnbRepository.findByCurrency(Currency.EUR).get().getSrednjiZaDevize().replace(",", ".")), 2, RoundingMode.HALF_UP));
+
+        recipe = Optional.of(recipeRepositoryJpa.save(recipe.get()));
+
+        return recipe.map(recipeMapper::mapRecipeToDTO);
+
+
     }
 
     @Override
