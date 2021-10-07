@@ -1,7 +1,5 @@
 package com.backend.recipes.service.shoppingList;
 
-import com.backend.recipes.command.recipe.RecipeSaveCommand;
-import com.backend.recipes.command.recipe.RecipeUpdateCommand;
 import com.backend.recipes.command.shoppingList.ShoppingListSaveCommand;
 import com.backend.recipes.command.shoppingList.ShoppingListUpdateCommand;
 import com.backend.recipes.command.shoppingList.nested.ShoppingListItemNestedSaveCommand;
@@ -86,6 +84,7 @@ public class ShoppingListServiceImpl implements ShoppingListService {
     }
 
     @Override
+    @Transactional
     public Optional<ShoppingListDTO> save(ShoppingListSaveCommand command) {
 
         ShoppingList shoppingList = ShoppingList.builder()
@@ -130,6 +129,7 @@ public class ShoppingListServiceImpl implements ShoppingListService {
     }
 
     @Override
+    @Transactional
     public Optional<ShoppingListDTO> update(ShoppingListUpdateCommand command) {
         Optional<ShoppingList> shoppingList = shoppingListRepositoryJpa.findById(command.getId());
 
@@ -178,7 +178,7 @@ public class ShoppingListServiceImpl implements ShoppingListService {
 
         shoppingList.get().setTotalPriceHrk(shoppingList.get().getShoppingListItems().stream().map(item -> item.getIngredient()
                         .getPriceHrk().multiply(new BigDecimal(item.getQuantity())))
-                .reduce(new BigDecimal(0), (a, b) -> a.add(b)));
+                .reduce(new BigDecimal(0), BigDecimal::add));
 
         shoppingList.get().setTotalPriceEur(shoppingList.get().getTotalPriceHrk().divide(new BigDecimal(hnbRepository.findByCurrency(Currency.EUR)
                 .get().getSrednjiZaDevize().replace(",", ".")), 2, RoundingMode.HALF_UP));
