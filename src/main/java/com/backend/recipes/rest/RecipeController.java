@@ -1,6 +1,7 @@
 package com.backend.recipes.rest;
 
 import com.backend.recipes.command.recipe.RecipeSaveCommand;
+import com.backend.recipes.command.recipe.RecipeUpdateCommand;
 import com.backend.recipes.dto.recipe.RecipeDTO;
 import com.backend.recipes.dto.recipe.RecipeDTOPaginated;
 import com.backend.recipes.service.recipe.RecipeService;
@@ -70,19 +71,19 @@ public class RecipeController {
                 );
     }
 
-//    @PutMapping
-//    public ResponseEntity<IngredientDTO> update(@Valid @RequestBody final IngredientUpdateCommand command) {
-//        return ingredientService.update(command)
-//                .map(productDTO -> ResponseEntity
-//                        .status(HttpStatus.OK)
-//                        .body(productDTO)
-//                )
-//                .orElseGet(
-//                        () -> ResponseEntity
-//                                .status(HttpStatus.CONFLICT)
-//                                .build()
-//                );
-//    }
+    @PutMapping
+    public ResponseEntity<RecipeDTO> update(@Valid @RequestBody final RecipeUpdateCommand command) {
+        return recipeService.update(command)
+                .map(productDTO -> ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(productDTO)
+                )
+                .orElseGet(
+                        () -> ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .build()
+                );
+    }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/id/{id}")

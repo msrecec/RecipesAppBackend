@@ -137,7 +137,7 @@ public class RecipeServiceImpl implements RecipeService{
                 }
             }
             if(!present) {
-                Optional<Ingredient> ingredient = ingredientRepositoryJpa.findById(command.getId());
+                Optional<Ingredient> ingredient = ingredientRepositoryJpa.findById(nestedSaveCommand.getId());
                 if(ingredient.isPresent()) {
                     RecipeItem recipeItem1 = RecipeItem.builder().quantity(nestedSaveCommand.getQuantity()).recipe(recipe.get()).ingredient(ingredient.get()).build();
                     recipeItem1 = recipeItemRepositoryJpa.save(recipeItem1);
@@ -149,7 +149,7 @@ public class RecipeServiceImpl implements RecipeService{
         for(RecipeItem recipeItem : recipe.get().getRecipeItems()) {
             boolean present = false;
             for(RecipeItemNestedSaveCommand nestedSaveCommand : command.getRecipeItems()) {
-                if(recipeItem.getRecipe().getId().equals(nestedSaveCommand.getId())) {
+                if(recipeItem.getIngredient().getId().equals(nestedSaveCommand.getId())) {
                     present = true;
                 }
             }
@@ -162,7 +162,8 @@ public class RecipeServiceImpl implements RecipeService{
                         .getPriceHrk().multiply(new BigDecimal(item.getQuantity())))
                 .reduce(new BigDecimal(0), (a, b) -> a.add(b)));
 
-        recipe.get().setTotalPriceEur(recipe.get().getTotalPriceHrk().divide(new BigDecimal(hnbRepository.findByCurrency(Currency.EUR).get().getSrednjiZaDevize().replace(",", ".")), 2, RoundingMode.HALF_UP));
+        recipe.get().setTotalPriceEur(recipe.get().getTotalPriceHrk().divide(new BigDecimal(hnbRepository.findByCurrency(Currency.EUR)
+                .get().getSrednjiZaDevize().replace(",", ".")), 2, RoundingMode.HALF_UP));
 
         recipe = Optional.of(recipeRepositoryJpa.save(recipe.get()));
 
@@ -172,7 +173,15 @@ public class RecipeServiceImpl implements RecipeService{
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
+        Optional<Recipe> recipe = recipeRepositoryJpa.findById(id);
+
+        for(RecipeItem r : recipe.get().getRecipeItems()) {
+            recipeItemRepositoryJpa.deleteById(r.getId());
+        }
+
+        recipeRepositoryJpa.deleteById(recipe.get().getId());
 
     }
 }
