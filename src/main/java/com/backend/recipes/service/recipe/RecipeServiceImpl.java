@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -60,7 +61,7 @@ public class RecipeServiceImpl implements RecipeService{
     }
 
     @Override
-    public Optional<RecipeDTOPaginated> findByPage(Integer page) {
+    public Optional<RecipeDTOPaginated> findPaginated(Integer page) {
 
         if(page < 0) {
             return Optional.empty();
@@ -106,7 +107,7 @@ public class RecipeServiceImpl implements RecipeService{
                 .getPriceHrk().multiply(new BigDecimal(item.getQuantity())))
                 .reduce(new BigDecimal(0), (a, b) -> a.add(b)));
 
-        recipe.setTotalPriceEur(recipe.getTotalPriceHrk().divide(new BigDecimal(hnbRepository.findByCurrency(Currency.EUR).get().getSrednjiZaDevize())));
+        recipe.setTotalPriceEur(recipe.getTotalPriceHrk().divide(new BigDecimal(hnbRepository.findByCurrency(Currency.EUR).get().getSrednjiZaDevize().replace(",", ".")), 2, RoundingMode.HALF_UP));
 
         recipe = recipeRepositoryJpa.save(recipe);
 

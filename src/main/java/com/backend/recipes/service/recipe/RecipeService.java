@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface RecipeService {
     List<RecipeDTO> findAll();
     Optional<RecipeDTO> findById(Long id);
-    Optional<RecipeDTOPaginated> findByPage(Integer page);
+    Optional<RecipeDTOPaginated> findPaginated(Integer page);
     Optional<RecipeDTO> save(RecipeSaveCommand command);
     void deleteById(Long id);
 }
