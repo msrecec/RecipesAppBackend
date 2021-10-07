@@ -1,0 +1,120 @@
+package com.backend.recipes.service.recipe;
+
+import com.backend.recipes.command.recipe.RecipeSaveCommand;
+import com.backend.recipes.command.recipe.nested.RecipeItemNestedSaveCommand;
+import com.backend.recipes.dto.recipe.RecipeDTO;
+import com.backend.recipes.dto.recipe.RecipeDTOPaginated;
+import com.backend.recipes.mapping.mapper.recipe.RecipeMapper;
+import com.backend.recipes.model.hnb.Currency;
+import com.backend.recipes.model.ingredient.Ingredient;
+import com.backend.recipes.model.recipe.Recipe;
+import com.backend.recipes.model.recipeItem.RecipeItem;
+import com.backend.recipes.repository.hnbAPI.HnbRepository;
+import com.backend.recipes.repository.ingredient.IngredientRepositoryJpa;
+import com.backend.recipes.repository.recipe.RecipeRepositoryJpa;
+import com.backend.recipes.repository.recipeItem.RecipeItemRepositoryJpa;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional
+public class RecipeServiceImpl implements RecipeService{
+
+    RecipeRepositoryJpa recipeRepositoryJpa;
+    IngredientRepositoryJpa ingredientRepositoryJpa;
+    RecipeItemRepositoryJpa recipeItemRepositoryJpa;
+    HnbRepository hnbRepository;
+    RecipeMapper recipeMapper;
+    private static final Integer pageSize = 10;
+
+    public RecipeServiceImpl(
+            RecipeRepositoryJpa recipeRepositoryJpa,
+            RecipeMapper recipeMapper,
+            IngredientRepositoryJpa ingredientRepositoryJpa,
+            RecipeItemRepositoryJpa recipeItemRepositoryJpa,
+            HnbRepository hnbRepository
+    ) {
+        this.recipeRepositoryJpa = recipeRepositoryJpa;
+        this.recipeMapper = recipeMapper;
+        this.ingredientRepositoryJpa = ingredientRepositoryJpa;
+        this.recipeItemRepositoryJpa = recipeItemRepositoryJpa;
+        this.hnbRepository = hnbRepository;
+    }
+
+    @Override
+    public List<RecipeDTO> findAll() {
+        return recipeRepositoryJpa.findAll().stream().map(recipeMapper::mapRecipeToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<RecipeDTO> findById(Long id) {
+        return recipeRepositoryJpa.findById(id).map(recipeMapper::mapRecipeToDTO);
+    }
+
+    @Override
+    public Optional<RecipeDTOPaginated> findByPage(Integer page) {
+
+        if(page < 0) {
+            return Optional.empty();
+        }
+
+        PageRequest pageRequest = PageRequest.of(page, pageSize);
+
+        List<Recipe> recipes = recipeRepositoryJpa.findAll(pageRequest).getContent();
+
+        long totalPages = recipeRepositoryJpa.findAll(pageRequest).getTotalPages();
+
+        return Optional.of(new RecipeDTOPaginated(recipes.stream().map(recipeMapper::mapRecipeToDTO).collect(Collectors.toList()), totalPages));
+    }
+
+    @Override
+    @Transactional
+    public Optional<RecipeDTO> save(RecipeSaveCommand command) {
+
+        Recipe recipe = Recipe.builder()
+                .name(command.getName())
+                .shortDescription(command.getShortDescription())
+                .description(command.getDescription())
+                .date(new Date())
+                .build();
+
+        recipe = recipeRepositoryJpa.save(recipe);
+
+        List<RecipeItemNestedSaveCommand> recipeItemNestedSaveCommands = command.getRecipeItems();
+        List<RecipeItem> recipeItems = new ArrayList<>();
+
+        for(RecipeItemNestedSaveCommand nestedSaveCommand : recipeItemNestedSaveCommands) {
+            Optional<Ingredient> ingredient = ingredientRepositoryJpa.findById(nestedSaveCommand.getId());
+            if(ingredient.isPresent()) {
+                RecipeItem recipeItem = RecipeItem.builder().quantity(nestedSaveCommand.getQuantity()).ingredient(ingredient.get()).recipe(recipe).build();
+                recipeItem = recipeItemRepositoryJpa.save(recipeItem);
+                recipeItems.add(recipeItem);
+            }
+        }
+
+        recipe.setRecipeItems(recipeItems);
+
+        recipe.setTotalPriceHrk(recipeItems.stream().map(item -> item.getIngredient()
+                .getPriceHrk().multiply(new BigDecimal(item.getQuantity())))
+                .reduce(new BigDecimal(0), (a, b) -> a.add(b)));
+
+        recipe.setTotalPriceEur(recipe.getTotalPriceHrk().divide(new BigDecimal(hnbRepository.findByCurrency(Currency.EUR).get().getSrednjiZaDevize())));
+
+        recipe = recipeRepositoryJpa.save(recipe);
+
+        return Optional.of(recipeMapper.mapRecipeToDTO(recipe));
+    }
+
+    @Override
+    public void deleteById(Long id) {
+
+    }
+}
