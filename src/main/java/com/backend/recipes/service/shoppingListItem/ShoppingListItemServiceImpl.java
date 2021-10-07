@@ -46,4 +46,11 @@ public class ShoppingListItemServiceImpl implements ShoppingListItemService{
     public List<ShoppingListItemDTO> findAll() {
         return shoppingListItemRepositoryJpa.findAll().stream().map(shoppingListItemMapper::mapShoppingListItemToDTO).collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteById(Long id) {
+
+        shoppingListItemRepositoryJpa.deleteById(id);
+
+    }
 }

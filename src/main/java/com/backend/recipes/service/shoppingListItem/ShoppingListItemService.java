@@ -11,5 +11,6 @@ public interface ShoppingListItemService {
     Optional<ShoppingListItemDTO> update(ShoppingListItemCommand command);
     Optional<ShoppingListItemDTO> findById(Long id);
     List<ShoppingListItemDTO> findAll();
+    void deleteById(Long id);
 
 }
