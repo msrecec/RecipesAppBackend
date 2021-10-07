@@ -131,7 +131,62 @@ public class ShoppingListServiceImpl implements ShoppingListService {
 
     @Override
     public Optional<ShoppingListDTO> update(ShoppingListUpdateCommand command) {
-        return Optional.empty();
+        Optional<ShoppingList> shoppingList = shoppingListRepositoryJpa.findById(command.getId());
+
+        if(shoppingList.isEmpty()) {
+            return Optional.empty();
+        }
+
+        shoppingList.get().setName(command.getName());
+        shoppingList.get().setDate(command.getDate());
+
+        for(ShoppingListItem shoppingListItem : shoppingList.get().getShoppingListItems()) {
+            boolean present = false;
+            for(ShoppingListItemNestedSaveCommand nestedSaveCommand : command.getShoppingListItems()) {
+                if(shoppingListItem.getIngredient().getId().equals(nestedSaveCommand.getId())) {
+                    present = true;
+                }
+            }
+            if(!present) {
+                shoppingListItemRepositoryJpa.deleteById(shoppingListItem.getId());
+            }
+        }
+
+        for(ShoppingListItemNestedSaveCommand nestedSaveCommand : command.getShoppingListItems()) {
+            boolean present = false;
+            for(ShoppingListItem shoppingListItem : shoppingList.get().getShoppingListItems()) {
+                if(shoppingListItem.getIngredient().getId().equals(nestedSaveCommand.getId())) {
+                    present = true;
+                    shoppingListItem.setQuantity(nestedSaveCommand.getQuantity());
+                    shoppingListItemRepositoryJpa.save(shoppingListItem);
+                }
+            }
+            if(!present) {
+                Optional<Ingredient> ingredient = ingredientRepositoryJpa.findById(nestedSaveCommand.getId());
+                if(ingredient.isPresent()) {
+                    ShoppingListItem shoppingListItem = ShoppingListItem
+                            .builder()
+                            .quantity(nestedSaveCommand.getQuantity())
+                            .shoppingList(shoppingList.get())
+                            .ingredient(ingredient.get())
+                            .build();
+                    shoppingListItem = shoppingListItemRepositoryJpa.save(shoppingListItem);
+                    shoppingList.get().getShoppingListItems().add(shoppingListItem);
+                }
+            }
+        }
+
+        shoppingList.get().setTotalPriceHrk(shoppingList.get().getShoppingListItems().stream().map(item -> item.getIngredient()
+                        .getPriceHrk().multiply(new BigDecimal(item.getQuantity())))
+                .reduce(new BigDecimal(0), (a, b) -> a.add(b)));
+
+        shoppingList.get().setTotalPriceEur(shoppingList.get().getTotalPriceHrk().divide(new BigDecimal(hnbRepository.findByCurrency(Currency.EUR)
+                .get().getSrednjiZaDevize().replace(",", ".")), 2, RoundingMode.HALF_UP));
+
+        shoppingList = Optional.of(shoppingListRepositoryJpa.save(shoppingList.get()));
+
+        return shoppingList.map(shoppingListMapper::mapShoppingListToDTO);
+
     }
 
     @Override
