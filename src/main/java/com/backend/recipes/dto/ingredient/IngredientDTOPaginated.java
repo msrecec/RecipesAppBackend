@@ -12,4 +12,5 @@ import java.util.List;
 public class IngredientDTOPaginated {
     List<IngredientDTO> ingredientDTO;
     long totalPages;
+    long totalElements;
 }

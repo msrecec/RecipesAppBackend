@@ -90,7 +90,9 @@ public class IngredientServiceImpl implements IngredientService {
 
         long totalPages = ingredientRepositoryJpa.findAll(pageRequest).getTotalPages();
 
-        return Optional.of(new IngredientDTOPaginated(ingredients.stream().map(ingredientMapper::mapIngredientToDTO).collect(Collectors.toList()), totalPages));
+        long totalElements = ingredientRepositoryJpa.findAll(pageRequest).getTotalElements();
+
+        return Optional.of(new IngredientDTOPaginated(ingredients.stream().map(ingredientMapper::mapIngredientToDTO).collect(Collectors.toList()), totalPages, totalElements));
 
     }
 

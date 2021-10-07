@@ -78,7 +78,9 @@ public class RecipeServiceImpl implements RecipeService{
 
         long totalPages = recipeRepositoryJpa.findAll(pageRequest).getTotalPages();
 
-        return Optional.of(new RecipeDTOPaginated(recipes.stream().map(recipeMapper::mapRecipeToDTO).collect(Collectors.toList()), totalPages));
+        long totalElements = recipeRepositoryJpa.findAll(pageRequest).getTotalElements();
+
+        return Optional.of(new RecipeDTOPaginated(recipes.stream().map(recipeMapper::mapRecipeToDTO).collect(Collectors.toList()), totalPages, totalElements));
     }
 
     @Override
@@ -120,6 +122,7 @@ public class RecipeServiceImpl implements RecipeService{
     }
 
     @Override
+    @Transactional
     public Optional<RecipeDTO> update(RecipeUpdateCommand command) {
         Optional<Recipe> recipe = recipeRepositoryJpa.findById(command.getId());
 
