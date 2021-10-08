@@ -133,6 +133,7 @@ public class RecipeServiceImpl implements RecipeService{
         recipe.get().setName(command.getName());
         recipe.get().setShortDescription(command.getShortDescription());
         recipe.get().setDescription(command.getDescription());
+        recipe.get().setDate(new Date());
 
         for(RecipeItem recipeItem : recipe.get().getRecipeItems()) {
             boolean present = false;
@@ -167,7 +168,7 @@ public class RecipeServiceImpl implements RecipeService{
 
         recipe.get().setTotalPriceHrk(recipe.get().getRecipeItems().stream().map(item -> item.getIngredient()
                         .getPriceHrk().multiply(new BigDecimal(item.getQuantity())))
-                .reduce(new BigDecimal(0), (a, b) -> a.add(b)));
+                .reduce(new BigDecimal(0), BigDecimal::add));
 
         recipe.get().setTotalPriceEur(recipe.get().getTotalPriceHrk().divide(new BigDecimal(hnbRepository.findByCurrency(Currency.EUR)
                 .get().getSrednjiZaDevize().replace(",", ".")), 2, RoundingMode.HALF_UP));
