@@ -1,15 +1,15 @@
-package com.backend.recipes.repository.recipeItem;
+package com.backend.recipes.repository.shoppingList;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 
 @Repository
-@Transactional
 public class ShoppingListRepositoryImpl implements ShoppingListRepository {
 
-    private final JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public ShoppingListRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;

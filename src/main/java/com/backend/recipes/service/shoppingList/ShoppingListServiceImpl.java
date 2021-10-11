@@ -12,9 +12,10 @@ import com.backend.recipes.model.shoppingList.ShoppingList;
 import com.backend.recipes.model.shoppingListItem.ShoppingListItem;
 import com.backend.recipes.repository.hnbAPI.HnbRepository;
 import com.backend.recipes.repository.ingredient.IngredientRepositoryJpa;
-import com.backend.recipes.repository.recipeItem.ShoppingListRepository;
+import com.backend.recipes.repository.shoppingList.ShoppingListRepository;
 import com.backend.recipes.repository.shoppingList.ShoppingListRepositoryJpa;
 import com.backend.recipes.repository.shoppingListItem.ShoppingListItemRepositoryJpa;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class ShoppingListServiceImpl implements ShoppingListService {
     private final ShoppingListMapper shoppingListMapper;
     private static final Integer pageSize = 10;
 
+    @Autowired
     public ShoppingListServiceImpl(
             ShoppingListRepositoryJpa shoppingListRepositoryJpa,
             ShoppingListRepository shoppingListRepository,
