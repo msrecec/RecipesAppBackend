@@ -1,5 +1,7 @@
 package com.backend.recipes.security.web;
 
+import com.backend.recipes.model.user.User;
+import com.backend.recipes.repository.user.UserRepositoryJpa;
 import com.backend.recipes.security.jwt.JwtFilter;
 import com.backend.recipes.security.jwt.TokenProvider;
 import org.springframework.http.HttpHeaders;
@@ -9,10 +11,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -21,10 +25,17 @@ public class LoginController {
 
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepositoryJpa userRepositoryJpa;
 
-    public LoginController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    public LoginController(TokenProvider tokenProvider,
+                           AuthenticationManagerBuilder authenticationManagerBuilder,
+                           PasswordEncoder passwordEncoder,
+                           UserRepositoryJpa userRepositoryJpa) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepositoryJpa = userRepositoryJpa;
     }
 
     @PostMapping("/authenticate")
@@ -43,6 +54,29 @@ public class LoginController {
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
 
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<JWTToken> register(@Valid @RequestBody LoginController.LoginDTO login) {
+
+        String encodedPassword = passwordEncoder.encode(login.getPassword());
+
+        Optional<User> user = userRepositoryJpa.findOneByUsername(login.getUsername());
+
+        if(user.isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        user = Optional.of(User.builder().username(login.getUsername()).firstName("Mislav").lastName("Srečec").password(encodedPassword).build());
+
+        user = Optional.of(userRepositoryJpa.save(user.get()));
+
+        if(user.isEmpty()) {
+            return ResponseEntity.internalServerError().build();
+        }
+
+        return ResponseEntity.ok().build();
+
     }
 
 

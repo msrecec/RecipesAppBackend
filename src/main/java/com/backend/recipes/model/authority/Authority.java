@@ -11,8 +11,11 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Builder
 @Entity
-@Table(name = "authority")
+@Table(name = "authority", schema = "public", uniqueConstraints = {
+        @UniqueConstraint(name = "id", columnNames = "id")
+})
 public class Authority {
     @SequenceGenerator(name = "authority_sequence", sequenceName = "authority_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "authority_sequence")

@@ -10,9 +10,12 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 @ToString
 @Entity
-@Table(name = "user")
+@Table(name = "user", schema = "public", uniqueConstraints = {
+        @UniqueConstraint(name = "id", columnNames = "id")
+})
 public class User {
     @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
