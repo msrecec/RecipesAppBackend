@@ -12,6 +12,7 @@ import com.backend.recipes.service.recipe.RecipeService;
 import com.backend.recipes.service.shoppingList.ShoppingListService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,11 +29,13 @@ public class ShoppingListController {
         this.shoppingListService = shoppingListService;
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping
     public List<ShoppingListDTO> findAll() {
         return shoppingListService.findAll();
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/page/{page}")
     public ResponseEntity<ShoppingListDTOPaginated> getIngredientPaginated(@PathVariable final Integer page) {
         if(page < 0) {
@@ -53,6 +56,7 @@ public class ShoppingListController {
 
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/id/{id}")
     public ResponseEntity<ShoppingListDTO> getIngredientById(@PathVariable final Long id) {
         return shoppingListService.findById(id)
@@ -62,6 +66,7 @@ public class ShoppingListController {
                 );
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping
     public ResponseEntity<ShoppingListDTO> save(@Valid @RequestBody final ShoppingListSaveCommand command) {
         return shoppingListService.save(command)
@@ -77,6 +82,7 @@ public class ShoppingListController {
                 );
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PutMapping
     public ResponseEntity<ShoppingListDTO> update(@Valid @RequestBody final ShoppingListUpdateCommand command) {
         return shoppingListService.update(command)
@@ -91,6 +97,7 @@ public class ShoppingListController {
                 );
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/id/{id}")
     public void delete(@PathVariable Long id) {

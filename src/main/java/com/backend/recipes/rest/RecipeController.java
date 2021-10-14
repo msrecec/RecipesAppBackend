@@ -7,6 +7,7 @@ import com.backend.recipes.dto.recipe.RecipeDTOPaginated;
 import com.backend.recipes.service.recipe.RecipeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,11 +24,13 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping
     public List<RecipeDTO> getRecipe() {
         return recipeService.findAll();
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/page/{page}")
     public ResponseEntity<RecipeDTOPaginated> getIngredientPaginated(@PathVariable final Integer page) {
         if(page < 0) {
@@ -48,6 +51,7 @@ public class RecipeController {
 
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/id/{id}")
     public ResponseEntity<RecipeDTO> getIngredientById(@PathVariable final Long id) {
         return recipeService.findById(id)
@@ -57,6 +61,7 @@ public class RecipeController {
                 );
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PostMapping
     public ResponseEntity<RecipeDTO> save(@Valid @RequestBody final RecipeSaveCommand command) {
         return recipeService.save(command)
@@ -72,6 +77,7 @@ public class RecipeController {
                 );
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PutMapping
     public ResponseEntity<RecipeDTO> update(@Valid @RequestBody final RecipeUpdateCommand command) {
         return recipeService.update(command)
@@ -86,6 +92,7 @@ public class RecipeController {
                 );
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/id/{id}")
     public void delete(@PathVariable Long id) {

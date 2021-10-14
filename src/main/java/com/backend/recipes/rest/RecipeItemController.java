@@ -7,6 +7,7 @@ import com.backend.recipes.dto.shoppingListItem.ShoppingListItemDTO;
 import com.backend.recipes.service.recipeItem.RecipeItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,11 +24,13 @@ public class RecipeItemController {
         this.recipeItemService = recipeItemService;
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping
     public List<RecipeItemDTO> findAll() {
         return recipeItemService.findAll();
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @GetMapping("/id/{id}")
     public ResponseEntity<RecipeItemDTO> findById(@PathVariable final Long id) {
         return recipeItemService.findById(id)
@@ -37,6 +40,7 @@ public class RecipeItemController {
                 );
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @PutMapping
     public ResponseEntity<RecipeItemDTO> update(@Valid @RequestBody final RecipeItemCommand command) {
         return recipeItemService.update(command)
@@ -51,6 +55,7 @@ public class RecipeItemController {
                 );
     }
 
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/id/{id}")
     public void delete(@PathVariable Long id) {

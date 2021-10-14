@@ -48,10 +48,6 @@ public class LoginController {
     @PostMapping("/authenticate")
     public ResponseEntity<JWTToken> authenticate(@Valid @RequestBody LoginController.LoginDTO login) {
 
-        Optional<User> user = userRepositoryJpa.findOneByUsername(login.getUsername());
-
-        List<Authority> authorities = user.get().getAuthorities();
-
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 login.getUsername(),
                 login.getPassword()
@@ -71,7 +67,6 @@ public class LoginController {
     @PostMapping("/user/register")
     public ResponseEntity<JWTToken> register(@Valid @RequestBody LoginController.RegisterDTO register) {
 
-
         Optional<User> user = userRepositoryJpa.findOneByUsername(register.getUsername());
 
         if(user.isPresent()) {
@@ -80,7 +75,12 @@ public class LoginController {
 
         String encodedPassword = passwordEncoder.encode(register.getPassword());
 
-        Optional<Authority> authority = authorityRepositoryJpa.findById(2L);
+        /**
+         * Finds the authority with ROLE_USER
+         *
+         */
+
+        Optional<Authority> authority = authorityRepositoryJpa.findById(3L);
 
         user = Optional.of(User.builder()
                 .username(register.getUsername())
