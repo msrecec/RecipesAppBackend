@@ -11,11 +11,11 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@ToString
 @Entity
 @Table(name = "user", schema = "public", uniqueConstraints = {
         @UniqueConstraint(name = "id", columnNames = "id")
 })
+@ToString
 public class User {
     @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
@@ -33,8 +33,10 @@ public class User {
     @ManyToMany(targetEntity = Authority.class)
     @JoinTable(
             name="user_authority",
+            schema = "public",
             joinColumns = { @JoinColumn(name="user_id") },
             inverseJoinColumns = { @JoinColumn(name = "authority_id") }
     )
+    @ToString.Exclude
     private List<Authority> authorities;
 }

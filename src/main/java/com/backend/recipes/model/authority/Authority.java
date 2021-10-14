@@ -10,12 +10,12 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 @Builder
 @Entity
 @Table(name = "authority", schema = "public", uniqueConstraints = {
         @UniqueConstraint(name = "id", columnNames = "id")
 })
+@ToString
 public class Authority {
     @SequenceGenerator(name = "authority_sequence", sequenceName = "authority_sequence", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "authority_sequence")
@@ -25,5 +25,6 @@ public class Authority {
     @Column(name="name")
     private String name;
     @ManyToMany(targetEntity = User.class, mappedBy = "authorities")
+    @ToString.Exclude
     private List<User> users;
 }
